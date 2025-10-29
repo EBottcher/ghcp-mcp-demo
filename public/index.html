@@ -5,6 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
     <style>
+        :root {
+            /* Light theme colors */
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --container-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #999999;
+            --border-color: #dddddd;
+            --border-focus: #667eea;
+            --input-bg: #ffffff;
+            --button-bg: #667eea;
+            --button-hover: #5568d3;
+            --todo-item-bg: #f8f9fa;
+            --todo-border: #667eea;
+            --delete-btn-bg: #dc3545;
+            --delete-btn-hover: #c82333;
+            --priority-low-bg: #d4edda;
+            --priority-low-text: #155724;
+            --priority-medium-bg: #fff3cd;
+            --priority-medium-text: #856404;
+            --priority-high-bg: #f8d7da;
+            --priority-high-text: #721c24;
+            --priority-urgent-bg: #721c24;
+            --priority-urgent-text: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme colors */
+            --bg-gradient-start: #1a1a2e;
+            --bg-gradient-end: #16213e;
+            --container-bg: #0f3460;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --border-color: #2a2a3e;
+            --border-focus: #5568d3;
+            --input-bg: #1a1a2e;
+            --button-bg: #5568d3;
+            --button-hover: #667eea;
+            --todo-item-bg: #1a1a2e;
+            --todo-border: #5568d3;
+            --delete-btn-bg: #e63946;
+            --delete-btn-hover: #ff4d5a;
+            --priority-low-bg: #2d5a3d;
+            --priority-low-text: #90ee90;
+            --priority-medium-bg: #5a4d2d;
+            --priority-medium-text: #ffd700;
+            --priority-high-bg: #5a2d2d;
+            --priority-high-text: #ff6b6b;
+            --priority-urgent-bg: #8b1e1e;
+            --priority-urgent-text: #ffffff;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,24 +65,58 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
             padding: 20px;
+            transition: background 0.3s ease;
         }
 
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: white;
+            background: var(--container-bg);
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             padding: 30px;
+            transition: background 0.3s ease;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
 
         h1 {
-            color: #333;
-            margin-bottom: 30px;
-            text-align: center;
+            color: var(--text-primary);
+            margin: 0;
+            transition: color 0.3s ease;
+        }
+
+        .theme-toggle {
+            background: var(--button-bg);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-toggle:hover {
+            background: var(--button-hover);
+            transform: scale(1.1);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
         }
 
         .add-todo-form {
@@ -42,45 +128,48 @@
         input[type="text"] {
             flex: 1;
             padding: 12px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 5px;
             font-size: 16px;
-            transition: border-color 0.3s;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--border-focus);
         }
 
         select {
             padding: 12px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 5px;
             font-size: 16px;
-            background: white;
+            background: var(--input-bg);
+            color: var(--text-primary);
             cursor: pointer;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
 
         select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--border-focus);
         }
 
         button {
             padding: 12px 24px;
-            background: #667eea;
+            background: var(--button-bg);
             color: white;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            background: #5568d3;
+            background: var(--button-hover);
         }
 
         .todo-list {
@@ -92,10 +181,10 @@
             align-items: center;
             padding: 15px;
             margin-bottom: 10px;
-            background: #f8f9fa;
+            background: var(--todo-item-bg);
             border-radius: 5px;
-            border-left: 4px solid #667eea;
-            transition: transform 0.2s;
+            border-left: 4px solid var(--todo-border);
+            transition: all 0.3s ease;
         }
 
         .todo-item:hover {
@@ -104,7 +193,7 @@
 
         .todo-item.completed .todo-text {
             text-decoration: line-through;
-            color: #999;
+            color: var(--text-secondary);
         }
 
         .todo-checkbox {
@@ -117,7 +206,8 @@
         .todo-text {
             flex: 1;
             font-size: 16px;
-            color: #333;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
         }
 
         .priority-badge {
@@ -126,54 +216,61 @@
             font-size: 12px;
             font-weight: bold;
             margin-right: 10px;
+            transition: all 0.3s ease;
         }
 
         .priority-low {
-            background: #d4edda;
-            color: #155724;
+            background: var(--priority-low-bg);
+            color: var(--priority-low-text);
         }
 
         .priority-medium {
-            background: #fff3cd;
-            color: #856404;
+            background: var(--priority-medium-bg);
+            color: var(--priority-medium-text);
         }
 
         .priority-high {
-            background: #f8d7da;
-            color: #721c24;
+            background: var(--priority-high-bg);
+            color: var(--priority-high-text);
         }
 
         .priority-urgent {
-            background: #721c24;
-            color: white;
+            background: var(--priority-urgent-bg);
+            color: var(--priority-urgent-text);
         }
 
         .delete-btn {
             padding: 6px 12px;
-            background: #dc3545;
+            background: var(--delete-btn-bg);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
         }
 
         .delete-btn:hover {
-            background: #c82333;
+            background: var(--delete-btn-hover);
         }
 
         .empty-state {
             text-align: center;
-            color: #999;
+            color: var(--text-secondary);
             padding: 40px;
             font-size: 18px;
+            transition: color 0.3s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📝 My Todo List</h1>
+        <div class="header">
+            <h1>📝 My Todo List</h1>
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </div>
         
         <div class="add-todo-form">
             <input type="text" id="todoInput" placeholder="Enter a new todo..." />
@@ -191,6 +288,30 @@
     </div>
 
     <script>
+        // Theme management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            icon.textContent = theme === 'light' ? '🌙' : '☀️';
+        }
+
+        // Initialize theme before page loads
+        initTheme();
+
         // Load todos on page load
         document.addEventListener('DOMContentLoaded', loadTodos);
 
