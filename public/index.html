@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .add-todo-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        .todo-list {
+            list-style: none;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s;
+        }
+
+        .todo-item:hover {
+            transform: translateX(5px);
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .todo-checkbox {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .priority-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .priority-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .priority-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .priority-urgent {
+            background: #721c24;
+            color: white;
+        }
+
+        .delete-btn {
+            padding: 6px 12px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 My Todo List</h1>
+        
+        <div class="add-todo-form">
+            <input type="text" id="todoInput" placeholder="Enter a new todo..." />
+            <select id="prioritySelect">
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+            </select>
+            <button onclick="addTodo()">Add</button>
+        </div>
+
+        <ul id="todoList" class="todo-list"></ul>
+        <div id="emptyState" class="empty-state">No todos yet. Add one above!</div>
+    </div>
+
+    <script>
+        // Load todos on page load
+        document.addEventListener('DOMContentLoaded', loadTodos);
+
+        // Allow Enter key to add todo
+        document.getElementById('todoInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        async function loadTodos() {
+            try {
+                const response = await fetch('/api/todos');
+                const todos = await response.json();
+                renderTodos(todos);
+            } catch (error) {
+                console.error('Error loading todos:', error);
+            }
+        }
+
+        async function addTodo() {
+            const input = document.getElementById('todoInput');
+            const select = document.getElementById('prioritySelect');
+            const text = input.value.trim();
+            const priority = select.value;
+
+            if (!text) {
+                alert('Please enter a todo item');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/todos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text, priority })
+                });
+
+                if (response.ok) {
+                    input.value = '';
+                    loadTodos();
+                }
+            } catch (error) {
+                console.error('Error adding todo:', error);
+            }
+        }
+
+        async function toggleTodo(id) {
+            try {
+                await fetch(`/api/todos/${id}`, {
+                    method: 'PATCH'
+                });
+                loadTodos();
+            } catch (error) {
+                console.error('Error toggling todo:', error);
+            }
+        }
+
+        async function deleteTodo(id) {
+            try {
+                await fetch(`/api/todos/${id}`, {
+                    method: 'DELETE'
+                });
+                loadTodos();
+            } catch (error) {
+                console.error('Error deleting todo:', error);
+            }
+        }
+
+        function renderTodos(todos) {
+            const todoList = document.getElementById('todoList');
+            const emptyState = document.getElementById('emptyState');
+
+            if (todos.length === 0) {
+                todoList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            todoList.style.display = 'block';
+            emptyState.style.display = 'none';
+
+            todoList.innerHTML = todos.map(todo => `
+                <li class="todo-item ${todo.completed ? 'completed' : ''}">
+                    <input 
+                        type="checkbox" 
+                        class="todo-checkbox" 
+                        ${todo.completed ? 'checked' : ''}
+                        onchange="toggleTodo(${todo.id})"
+                    />
+                    <span class="todo-text">${escapeHtml(todo.text)}</span>
+                    <span class="priority-badge priority-${todo.priority.toLowerCase()}">${todo.priority}</span>
+                    <button class="delete-btn" onclick="deleteTodo(${todo.id})">Delete</button>
+                </li>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
