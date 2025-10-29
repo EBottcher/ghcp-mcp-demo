@@ -1,0 +1,15 @@
+{
+  "name": "ghcp-mcp-demo",
+  "version": "1.0.0",
+  "description": "Simple todo app demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["todo", "express"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
